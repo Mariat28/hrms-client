@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import axios from '@/services/axiosInstance';
 import Link from 'next/link';
-export default function EmployeePage() {
+const EmployeePage=() =>{
     const [step, setStep] = useState(1);
     const [email,setEmail] = useState('');
     const [OTP,setOTP] = useState('');
@@ -13,41 +13,42 @@ export default function EmployeePage() {
     const [surname,setSurname] = useState('');
     const [otherName,setOtherName] = useState('');
     const [employeeNumber,setEmployeeNumber] = useState('');
-    const nextStep = () => {
-      if (step < 2) {
-        setStep(step + 1);
-      }
-    };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-
-    if (file) {
-      const maxSizeInBytes = 1 * 1024 * 1024;
-      const allowedTypes = ['image/jpeg', 'image/png']; 
-      const fileSize = file.size;
-      const fileType = file.type;
-
-      // Validate file type
-      if (!allowedTypes.includes(fileType)) {
-        setImgerrorMessage('Invalid file type. Please upload a .jpg or .png image.');
-        event.target.value = '';
-        return;
-      }else if (fileSize > maxSizeInBytes) {
-        setImgerrorMessage('File size exceeds 1MB. Please upload a smaller file.');
-        event.target.value = '';
-      } else {
-        setImgerrorMessage('');
-        // Convert file to base64
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
-          setBase64Image(base64String); // Store the base64 string
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-  };
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          const maxSizeInBytes = 1 * 1024 * 1024; // 1MB
+          const allowedTypes = ['image/jpeg', 'image/png']; 
+          const fileSize = file.size;
+          const fileType = file.type;
+      
+          // Validate file type
+          if (!allowedTypes.includes(fileType)) {
+            setImgerrorMessage('Invalid file type. Please upload a .jpg or .png image.');
+            event.target.value = ''; // Clear the file input
+            return;
+          }
+      
+          // Validate file size
+          if (fileSize > maxSizeInBytes) {
+            setImgerrorMessage('File size exceeds 1MB. Please upload a smaller file.');
+            event.target.value = ''; // Clear the file input
+            return;
+          }
+      
+          setImgerrorMessage(''); // Clear error message if file is valid
+      
+          // Convert file to base64
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64String = reader.result; // Keep the MIME type
+            setBase64Image(base64String); // Store the full base64 string (including MIME type)
+          };
+      
+          reader.readAsDataURL(file); // Start reading the file
+        }
+      };
+      
   const  validateOTP =async()=>{
     if(!email || !OTP){
         setErrorMessage('Email Address and OTP are mandatory');
@@ -65,8 +66,8 @@ export default function EmployeePage() {
             console.log("otp validated", response);
             step<2 ? setStep(step + 1) : setStep(step - 1);
         }).catch((error)=>{
-            console.log("otp validation error", error.response.data.error);
-            setErrorMessage(error.response.data.error)
+            console.log("otp validation error", error.response.data.message);
+            setErrorMessage(error.response.data.message)
         })
 
     }
@@ -100,7 +101,7 @@ export default function EmployeePage() {
       }
     };
     return (
-        <div className="flex flex-col justify-center items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+        <div className="flex flex-col dark:bg-white justify-center items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
             <div className=' flex flex-col gap-2 p-2 w-1/3'>
                 <div className="flex justify-between mb-4">
                     <div className={`flex-1 p-2  rounded-sm flex items-center ${step === 1 ? ' bg-blue-900 text-slate-200' : 'bg-slate-300 text-black'}`}>OTP Validation</div>
@@ -111,18 +112,18 @@ export default function EmployeePage() {
             <div className="p-4 border border-gray-300 rounded">
                 {step === 1 && (
                     <>
-                        <span className='text-sm'>Please enter your email and self onboarding OTP below</span>
+                        <span className='text-sm dark:text-black'>Please enter your email and self onboarding OTP below</span>
                         {errorMessage && <div className="text-red-500 text-xs mt-2">{errorMessage}</div>}
                         <div className='border border-blue-900 mt-2'>
                                 <div className="relative">
-                                    <input type="email" id="floating_outlined" className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " value={email} onChange={(e)=>setEmail(e.target.value)}/>
-                                    <label htmlFor="floating_outlined" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Email address</label>
+                                    <input type="email" id="floating_outlined" className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none  dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " value={email} onChange={(e)=>setEmail(e.target.value)}/>
+                                    <label htmlFor="floating_outlined" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white  px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Email address</label>
                                 </div>
                         </div>
                         <div className='border border-blue-900 mt-2'>
                                 <div className="relative">
-                                    <input type="number" id="floating_outlined5" className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " value={OTP} onChange={(e)=>setOTP(e.target.value)}/>
-                                    <label htmlFor="floating_outlined" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">OTP</label>
+                                    <input type="number" id="floating_outlined5" className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none  dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " value={OTP} onChange={(e)=>setOTP(e.target.value)}/>
+                                    <label htmlFor="floating_outlined" className="absolute text-sm text-gray-500  duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white  px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">OTP</label>
                                 </div>
                         </div>
                     </>
@@ -130,24 +131,24 @@ export default function EmployeePage() {
             
                 {step === 2 && (
                     <div className='flex flex-col gap-2'>
-                        <span className="text-sm">Enter the details below to complete registration</span>
+                        <span className="text-sm dark:text-black">Enter the details below to complete registration</span>
                         {errorMessage && <div className="text-red-500 text-xs mt-2">{errorMessage}</div>}
                         <div className='border border-blue-900 mt-1'>
                                 <div className="relative">
-                                    <input type="text" id="floating_outlined1" className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " value={surname} onChange={(e)=>setSurname(e.target.value)}/>
-                                    <label htmlFor="floating_outlined1" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Surname</label>
+                                    <input type="text" id="floating_outlined1" className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none  dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " value={surname} onChange={(e)=>setSurname(e.target.value)}/>
+                                    <label htmlFor="floating_outlined1" className="absolute text-sm text-gray-500  duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white  px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Surname</label>
                                 </div>
                         </div>
                         <div className='border border-blue-900 mt-1'>
                                 <div className="relative">
-                                    <input type="text" id="floating_outlined2" className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " value={otherName} onChange={(e)=>setOtherName(e.target.value)}/>
-                                    <label htmlFor="floating_outlined2" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">OtherName(s)</label>
+                                    <input type="text" id="floating_outlined2" className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none  dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " value={otherName} onChange={(e)=>setOtherName(e.target.value)}/>
+                                    <label htmlFor="floating_outlined2" className="absolute text-sm text-gray-500  duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white  px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">OtherName(s)</label>
                                 </div>
                         </div>
                         <div className='border border-blue-900 mt-1'>
                                 <div className="relative">
-                                    <input max="2007-01-01" type="date" id="floating_outlined3" className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " value={birthDate} onChange={(e)=>setBirthDate(e.target.value)}/>
-                                    <label htmlFor="floating_outlined3" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Birthdate</label>
+                                    <input max="2006-12-31" type="date" id="floating_outlined3" className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none  dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " value={birthDate} onChange={(e)=>setBirthDate(e.target.value)}/>
+                                    <label htmlFor="floating_outlined3" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white  px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Birthdate</label>
                                 </div>
                         </div>
                         <div className="mt-1">
@@ -165,7 +166,7 @@ export default function EmployeePage() {
                     </div>
                 )}
                 {step === 3 && (
-                    <div className='flex flex-col gap-2'>
+                    <div className='flex flex-col gap-2 text-black'>
                         <span className='text-xl italic'>Welcome aboard {otherName}!</span>
                         <div className='flex items-center gap-3'>
                             <span className='text-sm'>Your employee number is: </span>
@@ -193,4 +194,5 @@ export default function EmployeePage() {
         </div>
       );
   }
+  export default EmployeePage;
   

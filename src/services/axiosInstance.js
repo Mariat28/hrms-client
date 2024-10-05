@@ -30,10 +30,10 @@ axiosInstance.interceptors.request.use(
       method: config.method,
       url: config.url,
       headers: config.headers['Content-Type'],
-      data: config.data,
+      data:  config.method === 'get' ? (config.params ? config.params : null): (config.data ? config.data : null),
       timestamp: new Date().toISOString(),
-      responseStatus: null, // Placeholder for response status
-      responseData: null, // Placeholder for response data
+      responseStatus: null,
+      responseData: null,
     };
 
     // Store the log data in the config object for access in the response interceptor
