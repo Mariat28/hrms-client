@@ -177,6 +177,9 @@ const EmployeePage=() =>{
                 )}
             </div>
             <div className="flex justify-between mt-4">
+                {step === 2 && (
+                        <button className="bg-gray-300 text-gray-800 px-4 py-2 rounded" onClick={prevStep}>Back</button>
+                )}
                 {step < 2 && (
                 <button className="bg-blue-900 text-white px-4 py-2 rounded" onClick={validateOTP}>Next</button>
                 )}

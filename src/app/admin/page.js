@@ -26,8 +26,9 @@ const AdminPage=() =>{
         await axios.get('/api/users', { params: { employeeNumber: employeeNumber } }).then((response)=>{
           sessionStorage.setItem('fullName', `${response.data.surname} ${response.data.otherName}`);
           sessionStorage.setItem('token', `${sessionToken}`);
+          sessionStorage.setItem('role', `${response.data.Role}`);
           console.log('user role',response.data)
-          if(response.data.role_id === 1){
+          if(response.data.Role === 'Admin' || response.data.Role === 'HR'){
             router.replace('/admin/dashboard');
           } else{
             setErrorMessage('Unauthorized!')

@@ -18,8 +18,7 @@ const Dashboard=()=>{
     const [selectedEmployee,setSelectedEmployee] = useState('');
     const [selectedRole,setSelectedRole] = useState('');
     const [refresh,setRefresh]=useState(false);
-
-
+    const[userRole,setUserRole] = useState()
     const generateOTP = async()=>{
         setErrorMessage('')
         setSuccessMessage('')
@@ -48,6 +47,7 @@ const Dashboard=()=>{
     }
     useEffect(() => {
         const token = sessionStorage.getItem('token');
+        setUserRole(sessionStorage.getItem('role'));
         const storedFullName = sessionStorage.getItem('fullName');
         if (token && storedFullName) {
           setFullName(storedFullName); 
@@ -68,11 +68,11 @@ const Dashboard=()=>{
       };
     }, [router]);
 return(
-    <div className="flex flex-col dark:bg-blue-50   min-h-screen  font-[family-name:var(--font-geist-sans)] overflow-hidden h-screen">
+    <div className="flex flex-col dark:bg-blue-50 bg-blue-50  min-h-screen  font-[family-name:var(--font-geist-sans)] overflow-hidden h-screen">
         <div className=" bg-blue-900 flex justify-between items-center p-4 px-2">
-            <span className="text-xl font-semibold">DHRMS</span>
+            <span className="text-xl font-semibold text-white">DHRMS</span>
             <Link href="/">
-                <span className="cursor-pointer hover:underline" onClick={logoutHandler}>Logout</span>
+                <span className="cursor-pointer hover:underline text-white" onClick={logoutHandler}>Logout</span>
             </Link>
         </div>
         {/* sub nav */}
@@ -81,25 +81,27 @@ return(
                 <span className="text-blue-900 text-lg">Welcome, {fullName || 'User'}</span>
                 <span className="text-sm">Here's what's happening in HR today</span>
             </div>
-            <div className="mx-auto flex flex-col  justify-center  w-1/2">
-                <div className="relative w-full flex items-center pl-2 border border-slate-300">
-                    <MdOutlineMailOutline className="text-gray-400"/>
-                    <div className="relative w-full">
-                        <input type="search" autoComplete="off" id="employee-search" className="block p-2.5 w-full z-20 text-sm  rounded-e-lg  focus:ring-blue-500 focus:border-blue-500 text-slate-700    outline-0  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:border-blue-500 bg-blue-50" placeholder="Enter email address" required value={email} onChange={(e)=>setEmail(e.target.value)}/>
-                        <button type="submit" className="absolute  top-0 end-0 h-full p-2.5 text-sm font-medium text-white bg-blue-900   border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-900 dark:hover:bg-blue-900 dark:focus:ring-blue-800" onClick={generateOTP}>
-                         Generate OTP
-                        </button>
+                <div className="mx-auto flex flex-col  justify-center  w-1/2">
+                    <div className="relative w-full flex items-center pl-2 border border-slate-300">
+                        <MdOutlineMailOutline className="text-gray-400"/>
+                        <div className="relative w-full">
+                            <input type="search" autoComplete="off" id="employee-search" className="block p-2.5 w-full z-20 text-sm  rounded-e-lg  focus:ring-blue-500 focus:border-blue-500 text-slate-700    outline-0  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:border-blue-500 bg-blue-50" placeholder="Enter email address" required value={email} onChange={(e)=>setEmail(e.target.value)}/>
+                            <button type="submit" className="absolute  top-0 end-0 h-full p-2.5 text-sm font-medium text-white bg-blue-900   border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-900 dark:hover:bg-blue-900 dark:focus:ring-blue-800" onClick={generateOTP}>
+                            Generate OTP
+                            </button>
+                        </div>
                     </div>
+                    {errorMessage && <div className="text-red-500 text-xs mt-2">{errorMessage}</div>}
+                    {successMessage && <div className="text-green-600 text-xs mt-2">{successMessage}</div>}
                 </div>
-                {errorMessage && <div className="text-red-500 text-xs mt-2">{errorMessage}</div>}
-                {successMessage && <div className="text-green-600 text-xs mt-2">{successMessage}</div>}
-            </div>
         </div>
         {/* sub nav 2  */}
         <div className="p-2 mt-5">
             <div className="flex  p-1 text-base">
                 <div className={`  text-black cursor-pointer  py-2 px-4 rounded-tl-md ${tab===1 ? "bg-blue-100 border-b-2 border-blue-900":"bg-slate-100"}`} onClick={()=>setTab(1)}>Employees</div>
-                <div className={`  text-black cursor-pointer py-2 px-4  ${tab===2 ? "bg-blue-100 border-b-2 border-blue-900":"bg-slate-100"}`} onClick={()=>setTab(2)}>API requests</div>
+                {userRole==='Admin' &&
+                    <div className={`  text-black cursor-pointer py-2 px-4  ${tab===2 ? "bg-blue-100 border-b-2 border-blue-900":"bg-slate-100"}`} onClick={()=>setTab(2)}>API requests</div>
+                }
             </div>
             <div className="border border-t-0 h-[73vh]">
                 {tab===1 && <Users onUserEdit={showEdit} refresh={refresh}></Users>}

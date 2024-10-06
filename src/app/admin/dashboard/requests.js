@@ -4,14 +4,22 @@ import { useEffect, useState } from "react";
 const Requests=()=>{
     const [logs, setLogs] = useState([]);
     const [errorMessage, setErrorMessage] = useState('No system logs');
-    const fetchRequests=async()=>{
-        await axios.get('/api/logs').then((response)=>{
-            const loggedData=[...response.data]
+    const [failedCount,setFailedCount] =useState(0)
+    const [successCount,setSuccessCount] =useState(0)
+
+    const fetchRequests = async () => {
+        try {
+            const response = await axios.get('/api/logs');
+            const loggedData = [...response.data];
+            
             setLogs(loggedData);
-        }).catch((error)=>{
-            setErrorMessage(error.response.data.message);
-        })
-    }
+    
+            setFailedCount(loggedData.filter(log => log.responseStatus !== 200).length);
+            setSuccessCount(loggedData.filter(log => log.responseStatus === 200).length);
+        } catch (error) {
+            setErrorMessage(error.response?.data?.message || "An error occurred while fetching logs");
+        }
+    };
     useEffect(()=>{
         fetchRequests();
     },[])
@@ -30,8 +38,13 @@ const Requests=()=>{
     })
     return(
         <div className="dark:text-black mt-4 ">
+            <div className="flex gap-8 mb-2">
+                <span className="font-semibold">Total: <span className="text-blue-900">{apiLogs.length} requests</span></span>
+                <span className="font-semibold">Successful : <span className="text-green-700"> {successCount} requests</span> </span>
+               <span className="font-semibold"> Failed : <span className="text-red-700">{failedCount} requests</span></span>
+            </div>
         {/* table header  */}
-        <div className="grid grid-cols-7 items-center bg-slate-100 p-3 shadow">
+        <div className="grid grid-cols-7 items-center bg-slate-100 p-3 shadow mt-2">
             <div className="col-span-1">Log Id</div>
             <div className="col-span-1">Type</div>
             <div className="col-span-1">Url</div>
@@ -40,7 +53,7 @@ const Requests=()=>{
             <div className="col-span-1">Timestamp</div>
         </div>
         {/* table content  */}
-        <div className="h-[68vh] overflow-y-auto">
+        <div className="h-[60vh] overflow-y-auto">
             {apiLogs.length>0&&apiLogs}
             {(apiLogs.length===0 && errorMessage) &&<div className="flex flex-col h-full items-center justify-center">
                 <img src="/images/noLogs.svg" alt="noLogs" className="h-[300px] w-[300px]"/>
